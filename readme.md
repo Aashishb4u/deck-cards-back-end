@@ -7,34 +7,90 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
 </p>
 
-## About Laravel
+## Deck-Cards Application
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as:
+<h3>Installation</h3> - 
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Take a clone of repository and update the composer by -
+```
+        $ composer update
+```
+<h5> For NGINX Server </h5>
 
-Laravel is accessible, yet powerful, providing tools needed for large, robust applications. A superb combination of simplicity, elegance, and innovation give you tools you need to build any application with which you are tasked.
+Go to config file of NGINX server add path to public - 
+```
+        $ sudo vim /etc/nginx/sites-available/default
+```
 
-## Learning Laravel
+Create a Database name deck-cards by following commands - 
+```
+        $ mysql -u root -p
+        $ CREATE DATABASE deck-cards;
+```
+Add the password of database in .env file in the stack
 
-Laravel has the most extensive and thorough documentation and video tutorial library of any modern web application framework. The [Laravel documentation](https://laravel.com/docs) is thorough, complete, and makes it a breeze to get started learning the framework.
+Run migrate command to create tables in the application and seeder data.
+```
+        $ php artisan migrate
+```
+Give permission to profile_images folder in the public folder to save images.
+```
+        $ sudo chmod 777 -R public/profile_images/
+```
+<h5>Please ensure that server has permission to add images more than 1MB. </h5>
 
-If you're not in the mood to read, [Laracasts](https://laracasts.com) contains over 900 video tutorials on a range of topics including Laravel, modern PHP, unit testing, JavaScript, and more. Boost the skill level of yourself and your entire team by digging into our comprehensive video library.
+Modify NGINX Configuration File.
+```
+        $ sudo vim /etc/nginx/nginx.conf
+```
+Search for this variable: client_max_body_size. If you find it, just increase its size to 100M, for example. If it doesn’t exist, then you can add it inside and at the end of http
 
-## Contributing
+```
+        $ client_max_body_size 100M;
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](http://laravel.com/docs/contributions).
+Restart nginx to apply the changes.
+```
+        $ sudo service nginx restart
+```
 
-## Security Vulnerabilities
+Modify PHP.ini File for Upload Limits
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+It’s not needed on all configurations, but you may also have to modify the PHP upload settings as well to ensure that nothing is going out of limit by php configurations.
 
-## License
+If you are using PHP5-FPM use following command,
+```
+        $ sudo vim /etc/php5/fpm/php.ini
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
+If you are using PHP7.0-FPM use following command,
+```
+        $ sudo vim /etc/php/7.0/fpm/php.ini
+```
+Now find following directives one by one
+```
+        upload_max_filesize
+        post_max_size
+```
+and increase its limit to 100M, by default they are 8M and 2M.
+```
+        upload_max_filesize = 100M
+        post_max_size = 100M
+```
+
+Finally save it and restart PHP.
+PHP5-FPM users use this,
+```
+        sudo service php5-fpm restart
+```
+
+
+PHP7.0-FPM users use this,
+```
+        sudo service php7.0-fpm restart
+```
+
+<i>Note</i>: If you could not fix the image 'Entity too large issue' then we have given small size images in the public/profile_images folder.
+
+<b> Setup Done </b>
+
